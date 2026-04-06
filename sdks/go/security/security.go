@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/teracrafts/sdk_tpl-go/types"
+	"github.com/{{ORG_SLUG}}/{{SDK_SLUG}}-go/types"
 )
 
 // SignedPayload holds a payload along with its cryptographic signature metadata.

@@ -4,7 +4,7 @@ version = "1.0.0"
 edition = "2021"
 description = "SdkTpl - Official Rust SDK"
 license = "MIT"
-repository = "https://github.com/teracrafts/sdk_tpl"
+repository = "https://github.com/{{GITHUB_ORG}}/{{SDK_SLUG}}"
 keywords = ["sdk", "api", "sdk_tpl"]
 
 [dependencies]

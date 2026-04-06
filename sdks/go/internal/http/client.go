@@ -11,11 +11,11 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/teracrafts/sdk_tpl-go/config"
-	sdkerrors "github.com/teracrafts/sdk_tpl-go/errors"
-	"github.com/teracrafts/sdk_tpl-go/internal/version"
-	"github.com/teracrafts/sdk_tpl-go/security"
-	"github.com/teracrafts/sdk_tpl-go/types"
+	"github.com/{{ORG_SLUG}}/{{SDK_SLUG}}-go/config"
+	sdkerrors "github.com/{{ORG_SLUG}}/{{SDK_SLUG}}-go/errors"
+	"github.com/{{ORG_SLUG}}/{{SDK_SLUG}}-go/internal/version"
+	"github.com/{{ORG_SLUG}}/{{SDK_SLUG}}-go/security"
+	"github.com/{{ORG_SLUG}}/{{SDK_SLUG}}-go/types"
 )
 
 const (
