@@ -1,0 +1,15 @@
+name: {{SDK_SLUG}}
+description: {{SDK_NAME}} - Official Dart SDK
+version: {{SDK_VERSION}}
+repository: https://github.com/{{GITHUB_ORG}}/{{SDK_SLUG}}
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  http: ^1.0.0
+  crypto: ^3.0.0
+
+dev_dependencies:
+  test: ^1.24.0
+  mockito: ^5.4.0

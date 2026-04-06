@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>{{SDK_SLUG_PASCAL}}.Sdk</RootNamespace>
+    <Version>{{SDK_VERSION}}</Version>
+    <PackageId>{{SDK_SLUG_PASCAL}}.Sdk</PackageId>
+    <Authors>{{ORG_SLUG}}</Authors>
+    <Description>{{SDK_NAME}} SDK for .NET</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/{{GITHUB_ORG}}/{{SDK_SLUG}}-sdk</RepositoryUrl>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Text.Json" Version="8.0.0" />
+  </ItemGroup>
+</Project>

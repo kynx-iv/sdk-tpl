@@ -1,0 +1,309 @@
+version: '3'
+
+vars:
+  VERSION:
+    sh: cat VERSION | tr -d '[:space:]'
+
+tasks:
+  # ─── Version Management ────────────────────────────────────────────
+  version:
+    desc: Show current SDK version
+    cmds:
+      - echo "{{.VERSION}}"
+    silent: true
+
+  version-check:
+    desc: Verify all files match the VERSION file
+    cmds:
+      - |
+        VERSION="{{.VERSION}}"
+        ERRORS=0
+
+        check_file() {
+          local file="$1"
+          local pattern="$2"
+          if [ -f "$file" ]; then
+            if ! grep -q "$pattern" "$file" 2>/dev/null; then
+              echo "✗ $file — expected version $VERSION"
+              ERRORS=$((ERRORS + 1))
+            else
+              echo "✓ $file"
+            fi
+          fi
+        }
+
+        echo "Checking version $VERSION across all SDKs..."
+        echo ""
+
+        # Root
+        check_file "VERSION" "$VERSION"
+
+        # TypeScript
+        check_file "sdks/typescript/package.json" "\"version\": \"$VERSION\""
+        check_file "sdks/typescript/src/utils/version.ts" "$VERSION"
+
+        # React
+        check_file "sdks/react/package.json" "\"version\": \"$VERSION\""
+
+        # Python
+        check_file "sdks/python/pyproject.toml" "version = \"$VERSION\""
+        check_file "sdks/python/src/{{SDK_SLUG}}/utils/version.py" "$VERSION"
+
+        # Go
+        check_file "sdks/go/internal/version/version.go" "$VERSION"
+
+        # Java
+        check_file "sdks/java/pom.xml" "<version>$VERSION</version>"
+
+        # Kotlin
+        check_file "sdks/kotlin/build.gradle.kts" "version = \"$VERSION\""
+
+        # PHP
+        check_file "sdks/php/composer.json" "\"version\": \"$VERSION\""
+
+        # Swift
+        check_file "sdks/swift/Sources/{{SDK_SLUG_PASCAL}}/Version.swift" "$VERSION"
+
+        # Ruby
+        check_file "sdks/ruby/lib/{{SDK_SLUG}}/version.rb" "$VERSION"
+
+        # Rust
+        check_file "sdks/rust/Cargo.toml" "version = \"$VERSION\""
+
+        # Dart
+        check_file "sdks/dart/pubspec.yaml" "version: $VERSION"
+
+        # .NET
+        check_file "sdks/dotnet/src/{{SDK_SLUG_PASCAL}}.csproj" "<Version>$VERSION</Version>"
+
+        echo ""
+        if [ $ERRORS -gt 0 ]; then
+          echo "✗ $ERRORS version mismatches found"
+          exit 1
+        else
+          echo "✓ All versions match $VERSION"
+        fi
+
+  # ─── Build Tasks ───────────────────────────────────────────────────
+  build:
+    desc: Build all SDKs
+    cmds:
+      - task: build-ts
+      - task: build-react
+      - task: build-python
+      - task: build-go
+      - task: build-java
+      - task: build-kotlin
+      - task: build-php
+      - task: build-swift
+      - task: build-ruby
+      - task: build-rust
+      - task: build-dart
+      - task: build-dotnet
+
+  build-ts:
+    desc: Build TypeScript SDK
+    dir: sdks/typescript
+    cmds:
+      - npm run build
+
+  build-react:
+    desc: Build React SDK
+    dir: sdks/react
+    cmds:
+      - npm run build
+
+  build-python:
+    desc: Build Python SDK
+    dir: sdks/python
+    cmds:
+      - python -m build
+
+  build-go:
+    desc: Build Go SDK
+    dir: sdks/go
+    cmds:
+      - go build ./...
+
+  build-java:
+    desc: Build Java SDK
+    dir: sdks/java
+    cmds:
+      - mvn package -q
+
+  build-kotlin:
+    desc: Build Kotlin SDK
+    dir: sdks/kotlin
+    cmds:
+      - ./gradlew build
+
+  build-php:
+    desc: Build PHP SDK
+    dir: sdks/php
+    cmds:
+      - composer install --no-dev
+
+  build-swift:
+    desc: Build Swift SDK
+    dir: sdks/swift
+    cmds:
+      - swift build
+
+  build-ruby:
+    desc: Build Ruby SDK
+    dir: sdks/ruby
+    cmds:
+      - gem build *.gemspec
+
+  build-rust:
+    desc: Build Rust SDK
+    dir: sdks/rust
+    cmds:
+      - cargo build --release
+
+  build-dart:
+    desc: Build Dart SDK
+    dir: sdks/dart
+    cmds:
+      - dart pub get
+      - dart compile kernel lib/{{SDK_SLUG}}.dart || true
+
+  build-dotnet:
+    desc: Build .NET SDK
+    dir: sdks/dotnet
+    cmds:
+      - dotnet build -c Release
+
+  # ─── Test Tasks ────────────────────────────────────────────────────
+  test:
+    desc: Run tests for all SDKs
+    cmds:
+      - task: test-ts
+      - task: test-react
+      - task: test-python
+      - task: test-go
+      - task: test-java
+      - task: test-kotlin
+      - task: test-php
+      - task: test-swift
+      - task: test-ruby
+      - task: test-rust
+      - task: test-dart
+      - task: test-dotnet
+
+  test-ts:
+    desc: Test TypeScript SDK
+    dir: sdks/typescript
+    cmds:
+      - npm test
+
+  test-react:
+    desc: Test React SDK
+    dir: sdks/react
+    cmds:
+      - npm test
+
+  test-python:
+    desc: Test Python SDK
+    dir: sdks/python
+    cmds:
+      - python -m pytest --cov --cov-fail-under=80
+
+  test-go:
+    desc: Test Go SDK
+    dir: sdks/go
+    cmds:
+      - go test -race -coverprofile=coverage.out ./...
+      - go tool cover -func=coverage.out
+
+  test-java:
+    desc: Test Java SDK
+    dir: sdks/java
+    cmds:
+      - mvn test
+
+  test-kotlin:
+    desc: Test Kotlin SDK
+    dir: sdks/kotlin
+    cmds:
+      - ./gradlew test
+
+  test-php:
+    desc: Test PHP SDK
+    dir: sdks/php
+    cmds:
+      - composer test
+
+  test-swift:
+    desc: Test Swift SDK
+    dir: sdks/swift
+    cmds:
+      - swift test
+
+  test-ruby:
+    desc: Test Ruby SDK
+    dir: sdks/ruby
+    cmds:
+      - bundle exec rspec
+
+  test-rust:
+    desc: Test Rust SDK
+    dir: sdks/rust
+    cmds:
+      - cargo test
+
+  test-dart:
+    desc: Test Dart SDK
+    dir: sdks/dart
+    cmds:
+      - dart test
+
+  test-dotnet:
+    desc: Test .NET SDK
+    dir: sdks/dotnet
+    cmds:
+      - dotnet test
+
+  # ─── Utility Tasks ─────────────────────────────────────────────────
+  clean:
+    desc: Clean all build artifacts
+    cmds:
+      - rm -rf sdks/typescript/dist sdks/typescript/node_modules
+      - rm -rf sdks/react/dist sdks/react/node_modules
+      - rm -rf sdks/python/dist sdks/python/build sdks/python/*.egg-info
+      - rm -rf sdks/go/bin
+      - rm -rf sdks/java/target
+      - rm -rf sdks/kotlin/build
+      - rm -rf sdks/php/vendor
+      - rm -rf sdks/swift/.build
+      - rm -rf sdks/ruby/pkg
+      - rm -rf sdks/rust/target
+      - rm -rf sdks/dart/.dart_tool
+      - rm -rf sdks/dotnet/bin sdks/dotnet/obj
+
+  setup:
+    desc: Set up development environment
+    cmds:
+      - cd sdks/typescript && npm install
+      - cd sdks/react && npm install
+      - cd sdks/python && pip install -e ".[dev]"
+      - cd sdks/go && go mod tidy
+      - cd sdks/php && composer install
+      - echo "Setup complete"
+
+  validate:
+    desc: Validate release readiness
+    cmds:
+      - task: version-check
+      - task: test
+      - echo "✓ All validations passed"
+
+  bump-version:
+    desc: Bump version across all SDKs
+    cmds:
+      - ./scripts/bump-version.sh {{.CLI_ARGS}}
+
+  release:
+    desc: Release all SDKs
+    cmds:
+      - ./scripts/release.sh {{.CLI_ARGS}}

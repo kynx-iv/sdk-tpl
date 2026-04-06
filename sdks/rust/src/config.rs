@@ -1,0 +1,252 @@
+use crate::errors::{ErrorCode, SdkTplError};
+use std::time::Duration;
+
+/// Configuration for retry behavior on failed requests.
+#[derive(Debug, Clone)]
+pub struct RetryConfig {
+    /// Maximum number of retry attempts.
+    pub max_retries: u32,
+    /// Initial delay before the first retry.
+    pub initial_delay: Duration,
+    /// Maximum delay between retries.
+    pub max_delay: Duration,
+    /// Multiplier applied to the delay after each retry.
+    pub backoff_multiplier: f64,
+}
+
+impl Default for RetryConfig {
+    fn default() -> Self {
+        Self {
+            max_retries: 3,
+            initial_delay: Duration::from_millis(1000),
+            max_delay: Duration::from_secs(30),
+            backoff_multiplier: 2.0,
+        }
+    }
+}
+
+/// Configuration for the circuit breaker protecting outbound requests.
+#[derive(Debug, Clone)]
+pub struct CircuitBreakerConfig {
+    /// Number of consecutive failures before the circuit opens.
+    pub failure_threshold: u32,
+    /// Duration the circuit stays open before transitioning to half-open.
+    pub reset_timeout: Duration,
+    /// Number of successful probes required to close the circuit again.
+    pub half_open_max_requests: u32,
+}
+
+impl Default for CircuitBreakerConfig {
+    fn default() -> Self {
+        Self {
+            failure_threshold: 5,
+            reset_timeout: Duration::from_secs(30),
+            half_open_max_requests: 1,
+        }
+    }
+}
+
+/// Primary configuration for the {{SDK_NAME}} SDK client.
+///
+/// Use [`SdkTplConfig::builder`] for ergonomic construction.
+#[derive(Debug, Clone)]
+pub struct SdkTplConfig {
+    /// API key used for authentication.
+    pub api_key: String,
+    /// Base URL of the API.
+    pub base_url: String,
+    /// Request timeout.
+    pub timeout: Duration,
+    /// Retry configuration.
+    pub retry: RetryConfig,
+    /// Circuit breaker configuration.
+    pub circuit_breaker: CircuitBreakerConfig,
+    /// Enable debug logging.
+    pub debug: bool,
+    /// Enable sanitisation of sensitive data in error messages.
+    pub enable_error_sanitization: bool,
+}
+
+impl SdkTplConfig {
+    /// Returns a new [`SdkTplConfigBuilder`].
+    pub fn builder() -> SdkTplConfigBuilder {
+        SdkTplConfigBuilder::default()
+    }
+}
+
+/// Builder for [`SdkTplConfig`].
+#[derive(Debug)]
+pub struct SdkTplConfigBuilder {
+    api_key: Option<String>,
+    base_url: Option<String>,
+    timeout: Option<Duration>,
+    retry: Option<RetryConfig>,
+    circuit_breaker: Option<CircuitBreakerConfig>,
+    debug: bool,
+    enable_error_sanitization: bool,
+}
+
+impl Default for SdkTplConfigBuilder {
+    fn default() -> Self {
+        Self {
+            api_key: None,
+            base_url: None,
+            timeout: None,
+            retry: None,
+            circuit_breaker: None,
+            debug: false,
+            enable_error_sanitization: true,
+        }
+    }
+}
+
+impl SdkTplConfigBuilder {
+    /// Sets the API key for authentication.
+    pub fn api_key(mut self, api_key: impl Into<String>) -> Self {
+        self.api_key = Some(api_key.into());
+        self
+    }
+
+    /// Sets a custom base URL for the API.
+    pub fn base_url(mut self, base_url: impl Into<String>) -> Self {
+        self.base_url = Some(base_url.into());
+        self
+    }
+
+    /// Sets the request timeout.
+    pub fn timeout(mut self, timeout: Duration) -> Self {
+        self.timeout = Some(timeout);
+        self
+    }
+
+    /// Sets the retry configuration.
+    pub fn retry(mut self, retry: RetryConfig) -> Self {
+        self.retry = Some(retry);
+        self
+    }
+
+    /// Sets the circuit breaker configuration.
+    pub fn circuit_breaker(mut self, circuit_breaker: CircuitBreakerConfig) -> Self {
+        self.circuit_breaker = Some(circuit_breaker);
+        self
+    }
+
+    /// Enables or disables debug logging.
+    pub fn debug(mut self, debug: bool) -> Self {
+        self.debug = debug;
+        self
+    }
+
+    /// Enables or disables sanitisation of sensitive data in error messages.
+    pub fn enable_error_sanitization(mut self, enable: bool) -> Self {
+        self.enable_error_sanitization = enable;
+        self
+    }
+
+    /// Builds the [`SdkTplConfig`].
+    ///
+    /// # Errors
+    ///
+    /// Returns [`SdkTplError::Validation`] if required fields are
+    /// missing.
+    pub fn build(self) -> Result<SdkTplConfig, SdkTplError> {
+        let api_key = self.api_key.unwrap_or_default();
+
+        if api_key.is_empty() {
+            return Err(SdkTplError::Validation {
+                message: "API key is required".to_string(),
+                code: ErrorCode::Validation,
+                field: Some("api_key".to_string()),
+            });
+        }
+
+        let base_url = self.base_url.unwrap_or_else(|| {
+            if std::env::var("{{ENV_MODE_VAR}}")
+                .unwrap_or_default()
+                .to_lowercase()
+                == "local"
+            {
+                "{{API_LOCAL_URL}}".to_string()
+            } else {
+                "{{API_BASE_URL}}".to_string()
+            }
+        });
+
+        let timeout = self.timeout.unwrap_or(Duration::from_secs(30));
+        if timeout.is_zero() {
+            return Err(SdkTplError::Validation {
+                message: "timeout must be > 0".to_string(),
+                code: ErrorCode::Validation,
+                field: Some("timeout".to_string()),
+            });
+        }
+
+        let retry = self.retry.unwrap_or_default();
+        if retry.initial_delay.is_zero() {
+            return Err(SdkTplError::Validation {
+                message: "initial_delay must be > 0".to_string(),
+                code: ErrorCode::Validation,
+                field: Some("retry.initial_delay".to_string()),
+            });
+        }
+        if retry.max_delay < retry.initial_delay {
+            return Err(SdkTplError::Validation {
+                message: "max_delay must be >= initial_delay".to_string(),
+                code: ErrorCode::Validation,
+                field: Some("retry.max_delay".to_string()),
+            });
+        }
+
+        let circuit_breaker = self.circuit_breaker.unwrap_or_default();
+        if circuit_breaker.reset_timeout.is_zero() {
+            return Err(SdkTplError::Validation {
+                message: "reset_timeout must be > 0".to_string(),
+                code: ErrorCode::Validation,
+                field: Some("circuit_breaker.reset_timeout".to_string()),
+            });
+        }
+
+        Ok(SdkTplConfig {
+            api_key,
+            base_url,
+            timeout,
+            retry,
+            circuit_breaker,
+            debug: self.debug,
+            enable_error_sanitization: self.enable_error_sanitization,
+        })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_default_config() {
+        let config = SdkTplConfig::builder()
+            .api_key("test-key")
+            .build()
+            .unwrap();
+
+        assert_eq!(config.api_key, "test-key");
+        assert_eq!(config.base_url, "{{API_BASE_URL}}");
+        assert_eq!(config.timeout, Duration::from_secs(30));
+        assert!(!config.debug);
+    }
+
+    #[test]
+    fn test_custom_config() {
+        let config = SdkTplConfig::builder()
+            .api_key("test-key")
+            .base_url("https://custom.api.com")
+            .timeout(Duration::from_secs(60))
+            .debug(true)
+            .build()
+            .unwrap();
+
+        assert_eq!(config.base_url, "https://custom.api.com");
+        assert_eq!(config.timeout, Duration::from_secs(60));
+        assert!(config.debug);
+    }
+}

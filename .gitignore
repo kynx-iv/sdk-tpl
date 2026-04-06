@@ -1,0 +1,102 @@
+# ─── Dependencies ────────────────────────────────────────────────────
+node_modules/
+vendor/
+.bundle/
+Gemfile.lock
+
+# ─── Build outputs ───────────────────────────────────────────────────
+dist/
+build/
+out/
+bin/
+obj/
+target/
+.build/
+pkg/
+*.egg-info/
+
+# ─── Test & Coverage ────────────────────────────────────────────────
+coverage/
+htmlcov/
+.coverage
+*.lcov
+coverage.out
+test-results/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# ─── IDE ─────────────────────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# ─── OS ──────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ─── Logs ────────────────────────────────────────────────────────────
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# ─── Environment ─────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+.secrets.local
+
+# ─── Cache ───────────────────────────────────────────────────────────
+.cache/
+.turbo/
+.vite/
+__pycache__/
+.dart_tool/
+.packages
+
+# ─── Language-specific ───────────────────────────────────────────────
+# Python
+*.pyc
+*.pyo
+*.egg
+*.whl
+
+# Go
+go.sum
+
+# Rust
+Cargo.lock
+
+# Dart
+pubspec.lock
+.dart_tool/
+
+# Swift
+Package.resolved
+.swiftpm/
+
+# .NET
+*.nupkg
+*.suo
+*.user
+
+# Java/Kotlin
+.gradle/
+*.class
+*.jar
+
+# Ruby
+*.gem
+
+# PHP
+composer.lock
+
+# ─── Temp ────────────────────────────────────────────────────────────
+tmp/
+*.tmp
+*.bak
+sdks/typescript/package-lock.json

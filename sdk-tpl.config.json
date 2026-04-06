@@ -1,0 +1,59 @@
+{
+  "placeholders": {
+    "SDK_NAME": {
+      "description": "Display name for the SDK (e.g., Huefy, FlagKit)",
+      "example": "Acme",
+      "required": true
+    },
+    "SDK_SLUG": {
+      "description": "Lowercase slug used in package names, file paths, URLs",
+      "example": "acme",
+      "required": true
+    },
+    "SDK_SLUG_UPPER": {
+      "description": "Uppercase slug for environment variables and constants",
+      "example": "ACME",
+      "required": true
+    },
+    "SDK_SLUG_PASCAL": {
+      "description": "PascalCase slug for class names and type names",
+      "example": "Acme",
+      "required": true
+    },
+    "ORG_NAME": {
+      "description": "npm scope / organization name with @ prefix",
+      "example": "@acme",
+      "required": true
+    },
+    "ORG_SLUG": {
+      "description": "Organization slug for Go modules, Java packages, Maven groups",
+      "example": "acme",
+      "required": true
+    },
+    "API_BASE_URL": {
+      "description": "Production API base URL",
+      "example": "https://api.acme.dev/api/v1/sdk",
+      "required": true
+    },
+    "API_LOCAL_URL": {
+      "description": "Local development API base URL",
+      "example": "https://api.acme.localhost/api/v1/sdk",
+      "required": true
+    },
+    "SDK_VERSION": {
+      "description": "Initial SDK version (semver)",
+      "example": "1.0.0",
+      "required": true
+    },
+    "GITHUB_ORG": {
+      "description": "GitHub organization name",
+      "example": "acme",
+      "required": true
+    },
+    "ENV_MODE_VAR": {
+      "description": "Environment variable name for SDK mode (local/beta/production)",
+      "example": "ACME_MODE",
+      "required": true
+    }
+  }
+}
