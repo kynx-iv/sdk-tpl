@@ -29,7 +29,9 @@ data class SdkTplConfig(
      * Uses [baseUrl] if provided, otherwise falls back to the default API URL.
      */
     fun resolvedBaseUrl(): String {
-        return baseUrl ?: "{{API_BASE_URL}}"
+        if (baseUrl != null) return baseUrl
+        val mode = System.getenv("{{ENV_MODE_VAR}}")
+        return if (mode == "local") "{{API_LOCAL_URL}}" else "{{API_BASE_URL}}"
     }
 
     init {

@@ -97,6 +97,8 @@ class SdkTplConfig
      */
     public function resolvedBaseUrl(): string
     {
-        return $this->baseUrl ?? '{{API_BASE_URL}}';
+        if ($this->baseUrl !== null) return $this->baseUrl;
+        $mode = getenv('{{ENV_MODE_VAR}}') ?: '';
+        return $mode === 'local' ? '{{API_LOCAL_URL}}' : '{{API_BASE_URL}}';
     }
 }

@@ -23,7 +23,7 @@ const (
 	BASE_URL = "{{API_BASE_URL}}"
 
 	// LOCAL_BASE_URL is the local development API base URL.
-	LOCAL_BASE_URL = "{{API_BASE_URL_LOCAL}}"
+	LOCAL_BASE_URL = "{{API_LOCAL_URL}}"
 )
 
 // GetBaseURL returns the appropriate base URL based on the {{ENV_MODE_VAR}}

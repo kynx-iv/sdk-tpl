@@ -19,7 +19,7 @@ import { sanitizeErrorMessage } from '../errors/error-sanitizer';
 export const BASE_URL = '{{API_BASE_URL}}';
 
 /** Base URL used when running in local development mode. */
-export const LOCAL_BASE_URL = '{{API_BASE_URL_LOCAL}}';
+export const LOCAL_BASE_URL = '{{API_LOCAL_URL}}';
 
 /**
  * Resolves the base URL for API requests.

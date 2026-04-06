@@ -109,7 +109,7 @@ class SdkTplConfig {
   static String _defaultBaseUrl() {
     final envMode = getEnvironmentVariable('{{ENV_MODE_VAR}}') ?? '';
     if (envMode.toLowerCase() == 'local') {
-      return '{{API_BASE_URL_LOCAL}}';
+      return '{{API_LOCAL_URL}}';
     }
     return '{{API_BASE_URL}}';
   }
