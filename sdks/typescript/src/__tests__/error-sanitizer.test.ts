@@ -94,7 +94,7 @@ describe('sanitizeErrorMessage', () => {
     const testCases = [
       'postgres://user:pass@host:5432/db',
       'mysql://root:secret@localhost/mydb',
-      'mongodb://admin:pwd@cluster.mongodb.net/test',
+      'mongodb://admin:pwd@cluster.example.com/test',
       'redis://default:password@cache.example.com:6379',
     ];
 
